@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Room Control Panel</title>
+    <script>
+        strLED1 = "";
+		strLED2 = "";
+		strLED3 = "";
+		strLED4 = "";
+		var LED3_state = 0;
+		var LED4_state = 0;
+		var strLED4wrt = "OFF";
+		function GetArduinoIO()
+		{
+			nocache = "&nocache=" + Math.random() * 1000000;
+			var request = new XMLHttpRequest();
+			request.onreadystatechange = function()
+			{
+				if (this.readyState == 4) {
+					if (this.status == 200) {
+						if (this.responseXML != null) {
+							// XML file received - contains analog values, switch values and LED states					
+							if (this.responseXML.getElementsByTagName('LED')[2].childNodes[0].nodeValue === "on") {
+								document.getElementById("LED3").innerHTML = "ON";
+								LED3_state = 1;
+							}
+							else {
+								document.getElementById("LED3").innerHTML = "OFF";
+								LED3_state = 0;
+							}
+							// LED 4
+							if (this.responseXML.getElementsByTagName('LED')[3].childNodes[0].nodeValue === "on") {
+								document.getElementById("LED4").innerHTML = "ON";
+								LED4_state = 1;
+							}
+							else {
+								document.getElementById("LED4").innerHTML = "OFF";
+								LED4_state = 0;
+							}
+						}
+					}
+				}
+			}
+			// send HTTP GET request with LEDs to switch on/off if any
+			request.open("GET", "ajax_inputs" + strLED1 + strLED2 + strLED3 + strLED4 + nocache, true);
+			request.send(null);
+			setTimeout('GetArduinoIO()', 1000);
+			strLED1 = "";
+			strLED2 = "";
+			strLED3 = "";
+			strLED4 = "";
+		}
+		// service LEDs when checkbox checked/unchecked
+		function GetCheck()
+		{
+			if (LED_form.LED1.checked) {
+				strLED1 = "&LED1=1";
+			}
+			else {
+				strLED1 = "&LED1=0";
+			}
+			if (LED_form.LED2.checked) {
+				strLED2 = "&LED2=1";
+			}
+			else {
+				strLED2 = "&LED2=0";
+			}
+		}
+		function GetButton1()
+		{
+			if (LED3_state === 1) {
+				LED3_state = 0;
+				strLED3 = "&LED3=0";
+			}
+			else {
+				LED3_state = 1;
+				strLED3 = "&LED3=1";
+			}
+		}
+		function GetButton2()
+		{
+			if (LED4_state === 1) {
+				LED4_state = 0;
+				strLED4 = "&LED4=0";
+			}
+			else {
+				LED4_state = 1;
+				strLED4 = "&LED4=1";
+			}
+			
+		}
+
+	</script>
+
+    <style>
+        body{
+            background-color: #36393f;
+        }
+		.IO_box {
+			float: center;
+			margin: 0 20px 20px 0;
+			border: 1px solid white;
+            outline: 2px solid black;
+			padding: 0 5px 0 5px;
+			width: 140px;
+			align-content: center; 
+			justify-content: center;
+		}
+		h1 {
+			font-size: 50px;
+			color: white;
+			margin: 0 0 10px 0;
+			text-align: center;
+            text-decoration: none;
+            font-family: sans-serif;
+            text-shadow:
+		          -3px -3px 0 #000,
+		          3px -3px 0 #000,
+		          -3px 3px 0 #000,
+		          3px 3px 0 #000;
+		}
+		h2 {
+			font-size: 30px;
+			color: white; 
+			margin: 5px 0 5px 0;
+			text-decoration: none;
+            font-family: sans-serif;
+            text-align: center;
+            border-bottom: 1px solid #47484b; 
+            padding-bottom: 6px;
+		}
+		p, form, button {
+			font-size: 80%;
+			color: white;
+		}
+		.small_text {
+			font-size: 70%;
+			color: #737373;
+		}
+		.light_button{
+			align-content: center;
+			width: inherit;
+			padding-bottom: 40px;
+		}
+		.button{
+			background-color: #3981F0;
+  			border-style: solid;
+			border-color: #000000;
+  			color: black;
+  			padding: 15px 32px;
+  			text-align: center;
+  			text-decoration: none;
+  			font-size: 20px;
+			float: right;
+			height: auto;
+			width: 100%;
+            
+		}
+		.IO_box_1{
+			justify-content: center;
+		}
+        .check{
+            font-family: sans-serif;
+        }
+        .light_text{
+        font-family: sans-serif;
+        text-align: center;
+        font-size: 15px;
+        padding: 0px;
+        
+        }
+        #lamp_text{
+            padding-top: 16px;
+        }
+        .button:hover{
+            background-color: #5f9eea;
+        }
+        .body_1{
+            justify-content: center; 
+            align-content: center;
+            }
+        .everthing{
+            flex-wrap: wrap;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+	</style>
+</head>
+
+<body onload="GetArduinoIO()" class="body_1">
+    <div class="everthing">
+    <h1>Control Panel</h1>
+    <div class="IO_box">
+        <h2>Lights</h2>
+        <div class="light_button">
+            <p class="light_text">Main Lights</p>
+            <button class="button" type="button" id="LED3" onclick="GetButton1()">OFF</button><br /><br />
+            <p class="light_text" id="lamp_text">Lamp</p>
+            <button class="button" type="button" id="LED4" onclick="GetButton2()">OFF</button><br /><br />
+        </div>
+    </div>
+    </div>
+</body>
+
+</html>
